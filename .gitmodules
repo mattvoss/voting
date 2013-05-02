@@ -1,0 +1,54 @@
+[submodule "vendors/bootstrap-notify"]
+	path = vendors/bootstrap-notify
+	url = git://github.com/Nijikokun/bootstrap-notify.git
+[submodule "vendors/bootstrap-switch"]
+	path = vendors/bootstrap-switch
+	url = git://github.com/nostalgiaz/bootstrap-switch.git
+[submodule "vendors/toolbar"]
+	path = vendors/toolbar
+	url = git://github.com/paulkinzett/toolbar.git
+[submodule "vendors/Backbone.Typeahead"]
+	path = vendors/Backbone.Typeahead
+	url = git://github.com/aodin/Backbone.Typeahead.git
+[submodule "vendors/backbone-forms"]
+	path = vendors/backbone-forms
+	url = git://github.com/powmedia/backbone-forms.git
+[submodule "vendors/bootstrap"]
+	path = vendors/bootstrap
+	url = git://github.com/twitter/bootstrap.git
+[submodule "vendors/select2"]
+	path = vendors/select2
+	url = git://github.com/ivaynberg/select2.git
+[submodule "vendors/bootstrap-datepicker"]
+	path = vendors/bootstrap-datepicker
+	url = git://github.com/eternicode/bootstrap-datepicker.git
+[submodule "vendors/machina"]
+	path = vendors/machina
+	url = git://github.com/ifandelse/machina.js.git
+[submodule "vendors/bootstrap-select"]
+	path = vendors/bootstrap-select
+	url = git://github.com/silviomoreto/bootstrap-select.git
+[submodule "vendors/backbone-pageable"]
+	path = vendors/backbone-pageable
+	url = git://github.com/wyuenho/backbone-pageable.git
+[submodule "vendors/backgrid"]
+	path = vendors/backgrid
+	url = git://github.com/wyuenho/backgrid.git
+[submodule "vendors/backbone"]
+	path = vendors/backbone
+	url = git://github.com/documentcloud/backbone.git
+[submodule "vendors/underscore"]
+	path = vendors/underscore
+	url = https://github.com/documentcloud/underscore
+[submodule "vendors/swag"]
+	path = vendors/swag
+	url = git://github.com/elving/swag.git
+[submodule "vendors/jQuery-CreditCardValidator"]
+	path = vendors/jQuery-CreditCardValidator
+	url = git://github.com/PawelDecowski/jQuery-CreditCardValidator.git
+[submodule "vendors/credit_card_track_parser"]
+	path = vendors/credit_card_track_parser
+	url = git://github.com/jpartlow/credit_card_track_parser.git
+[submodule "vendors/backbone.bootstrap-modal"]
+	path = vendors/backbone.bootstrap-modal
+	url = git://github.com/mattvoss/backbone.bootstrap-modal.git

@@ -1,0 +1,29 @@
+{
+    "name": "VotingApp",
+    "description": "An app to vote",
+    "version": "0.1.0",
+    "author": "Matt Voss",
+    "repo": "git@admin.8xmedia.com:vpppa/voting.git",
+    "keywords": [ ],
+    "dependencies": {
+        "underscore": "latest",
+        "uglify-js": "latest",
+        "express.io": "latest",
+        "session.socket.io": "latest",
+        "mysql": ">=2.0.0-alpha3",
+        "nodemailer": "latest",
+        "async": "latest",
+        "acl": "latest",
+        "node-uuid": "latest",
+        "glob": "latest",
+        "redis": "latest",
+        "connect-redis": "latest",
+        "connect-multi-redis": "latest",
+        "handlebars": "latest",
+        "pdf417": "git://github.com/mattvoss/pdf417-js.git",
+        "ipp": "latest"
+    },
+    "scripts": {
+        "postinstall": "node bundler.js"
+    }
+}
