@@ -16,7 +16,7 @@ var models = [
 ];
 var views = [
     'js/views/OfficesView',
-    'js/views/VerifyVoterView'
+    'js/views/VerifyVoterView',
     'js/views/AppView'
 ];
 var routers = [
@@ -30,6 +30,8 @@ var data = [
 ];
 var templates = [
     'verifyVoter',
+    'offices',
+    'wizardPager',
     'header'
 ];
 
@@ -67,8 +69,9 @@ var vendors = [
     'bootstrap-notify/js/bootstrap-notify',
     'bootstrap-switch/static/js/bootstrapSwitch',
     'toolbar/jquery.toolbar',
-    'bootstrap-select/bootstrap-select'
-    'swag/lib/swag'
+    'bootstrap-select/bootstrap-select',
+    'swag/lib/swag',
+    'twitter-bootstrap-wizard/jquery.bootstrap.wizard'
 ];
 
 var bundle = '';

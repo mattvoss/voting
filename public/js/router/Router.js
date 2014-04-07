@@ -35,10 +35,14 @@ var Router = Backbone.Router.extend({
     },
 
     offices: function() {
-        App.Models.offices = new Offices().get();
-        var main = new OfficesView({ model: App.Models.offices });
-        this.setBody(main, true);
-        this.view.body.render();
+        var view = this;
+        App.Models.offices = new Offices();
+        App.Models.offices.fetch({success: function(model, response, options) {
+            var main = new OfficesView({ collection: App.Models.offices });
+            view.setBody(main, true);
+            view.view.body.render();
+        }});
+
     },
 
     verifyVoter: function() {

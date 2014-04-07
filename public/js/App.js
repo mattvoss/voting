@@ -22,8 +22,8 @@ var App = {
         this.Models = {};
         this.Router = new Router();
         Backbone.history.start({pushState: true});
-        this.Models.events = new Events();
-        this.Models.events.fetch();
+        //this.Models.events = new Events();
+        //this.Models.events.fetch();
         var self = this;
 
     },
