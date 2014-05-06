@@ -71,7 +71,8 @@ exports.initialize = function() {
       "username": opts.configs.get("mysql:checkin:username"),
       "password": opts.configs.get("mysql:checkin:password"),
       "database": opts.configs.get("mysql:checkin:database"),
-      "port": opts.configs.get("mysql:checkin:port") || 3306
+      "port": opts.configs.get("mysql:checkin:port") || 3306,
+      "logging": false
     });
 
     CheckinMemberFieldValues = db.checkin.define('member_field_values', {
@@ -336,8 +337,9 @@ exports.authVoter = function(req, res) {
       };
   Votes.find({ where: {registrantid: registrantId} }).success(function(vote) {
     if (vote === null) {
-      registrants.getAttendee(regId, regType, function(member) {
+      registrants.getAttendee(registrantId, function(member) {
         if (member !== null) {
+          console.log("member", member);
           member.siteId = ("siteid" in member) ? member.siteid : member.siteId;
           if (member.siteId !== "") {
             getSiteInfo(member.siteId, function(site) {

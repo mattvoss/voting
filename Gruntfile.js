@@ -1,7 +1,44 @@
 module.exports = function(grunt) {
   // Load Grunt tasks declared in the package.json file
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
-
+  var srcCss = [
+      'lib/bootstrap/bootstrap.css',
+      'bower_components/Bootflat/bootflat/css/bootflat.css',
+      'bower_components/bootstrap-jasny/dist/extend/css/jasny-bootstrap.css',
+      'lib/font-awesome/css/font-awesome.css',
+      'lib/selectize/selectize.css',
+      'lib/ladda-bootstrap/ladda-themeless.css',
+      'lib/messenger/messenger.css',
+      'lib/messenger/messenger-theme-future.css',
+      'lib/typeahead-css/typeaheadjs.css',
+      'bower_components/iCheck/skins/line/aero.css',
+      'lib/keyboard/keyboard.css',
+      'lib/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css',
+      'assets/css/custom.css'
+      ],
+      srcJs = [
+      'lib/jquery/jquery.js',
+      'lib/handlebars/handlebars.js',
+      'lib/swag/swag.js',
+      'lib/underscore/underscore.js',
+      'lib/bootstrap/bootstrap.js',
+      'bower_components/bootstrap-jasny/dist/extend/js/jasny-bootstrap.js',
+      'lib/backbone/backbone.js',
+      'lib/backbone.wreqr/backbone.wreqr.js',
+      'lib/backbone.babysitter/backbone.babysitter.js',
+      'lib/backbone.supermodel/backbone.supermodel.js',
+      'bower_components/marionette/lib/core/backbone.marionette.js',
+      'lib/backbone.marionette.handlebars/backbone.marionette.handlebars.js',
+      'lib/moment/moment.js',
+      'lib/messenger/messenger.js',
+      'lib/messenger/messenger-theme-future.js',
+      'lib/typeahead.js/typeahead.bundle.js',
+      'bower_components/iCheck/icheck.js',
+      'lib/jquery-ui/jquery-ui.js',
+      'lib/keyboard/jquery.keyboard.js',
+      'bower_components/keyboard/js/jquery.keyboard.extension-all.js',
+      'lib/fixed-header-table/jquery.fixedheadertable.js'
+      ];
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -31,29 +68,7 @@ module.exports = function(grunt) {
           sourceMap: 'public/js/vendors.min.map'
         },
         files: {
-          'public/js/vendors.min.js': [
-            'lib/jquery/jquery.js',
-            'lib/handlebars/handlebars.js',
-            'lib/swag/swag.js',
-            'lib/underscore/underscore.js',
-            'lib/bootstrap/bootstrap.js',
-            'bower_components/bootstrap-jasny/dist/extend/js/jasny-bootstrap.js',
-            'lib/backbone/backbone.js',
-            'lib/backbone.wreqr/lib/backbone.wreqr.js',
-            'lib/backbone.babysitter/backbone.babysitter.js',
-            'lib/backbone.supermodel/backbone.supermodel.js',
-            'bower_components/marionette/lib/core/backbone.marionette.js',
-            'lib/backbone.marionette.handlebars/backbone.marionette.handlebars.js',
-            'lib/moment/moment.js',
-            'lib/messenger/messenger.js',
-            'lib/messenger/messenger-theme-future.js',
-            'lib/typeahead.js/typeahead.bundle.js',
-            'bower_components/iCheck/icheck.js',
-            'lib/jquery-ui/jquery-ui.js',
-            'lib/keyboard/jquery.keyboard.js',
-            'bower_components/keyboard/js/jquery.keyboard.extension-all.js',
-            'lib/fixed-header-table/jquery.fixedheadertable.js '
-          ]
+          'public/js/vendors.min.js': srcJs
         }
       },
       app: {
@@ -70,21 +85,7 @@ module.exports = function(grunt) {
     cssmin: {
       combine: {
         files: {
-          'public/css/app.css': [
-            'lib/bootstrap/bootstrap.css',
-            'bower_components/Bootflat/bootflat/css/bootflat.css',
-            'bower_components/bootstrap-jasny/dist/extend/css/jasny-bootstrap.css',
-            'lib/font-awesome/css/font-awesome.css',
-            'lib/selectize/selectize.css',
-            'lib/ladda-bootstrap/ladda-themeless.css',
-            'lib/messenger/messenger.css',
-            'lib/messenger/messenger-theme-future.css',
-            'lib/typeahead-css/typeaheadjs.css',
-            'bower_components/iCheck/skins/line/aero.css',
-            'lib/keyboard/keyboard.css',
-            'lib/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css',
-            'assets/css/custom.css'
-          ]
+          'public/css/app.css': srcCss
         }
       }
     },
@@ -95,21 +96,7 @@ module.exports = function(grunt) {
           '<%= grunt.template.today("yyyy-mm-dd") %> */',
       },
       css: {
-        src: [
-          'lib/bootstrap/bootstrap.css',
-          'bower_components/Bootflat/bootflat/css/bootflat.css',
-          'bower_components/bootstrap-jasny/dist/extend/css/jasny-bootstrap.css',
-          'lib/font-awesome/css/font-awesome.css',
-          'lib/selectize/selectize.css',
-          'lib/ladda-bootstrap/ladda-themeless.css',
-          'lib/messenger/messenger.css',
-          'lib/messenger/messenger-theme-future.css',
-          'lib/typeahead-css/typeaheadjs.css',
-          'bower_components/iCheck/skins/line/aero.css',
-          'lib/keyboard/keyboard.css',
-          'lib/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css',
-          'assets/css/custom.css'
-        ],
+        src: srcCss,
         dest: 'public/css/app.css',
       },
       app: {
@@ -119,29 +106,7 @@ module.exports = function(grunt) {
         dest: 'public/js/app.min.js',
       },
       jsDev: {
-        src: [
-          'lib/jquery/jquery.js',
-          'lib/handlebars/handlebars.js',
-          'lib/swag/swag.js',
-          'lib/underscore/underscore.js',
-          'lib/bootstrap/bootstrap.js',
-          'bower_components/bootstrap-jasny/dist/extend/js/jasny-bootstrap.js',
-          'lib/backbone/backbone.js',
-          'lib/backbone.wreqr/lib/backbone.wreqr.js',
-          'lib/backbone.babysitter/backbone.babysitter.js',
-          'lib/backbone.supermodel/backbone.supermodel.js',
-          'bower_components/marionette/lib/core/backbone.marionette.js',
-          'lib/backbone.marionette.handlebars/backbone.marionette.handlebars.js',
-          'lib/moment/moment.js',
-          'lib/messenger/messenger.js',
-          'lib/messenger/messenger-theme-future.js',
-          'lib/typeahead.js/typeahead.bundle.js',
-          'bower_components/iCheck/icheck.js',
-          'lib/jquery-ui/jquery-ui.js',
-          'lib/keyboard/jquery.keyboard.js',
-          'bower_components/keyboard/js/jquery.keyboard.extension-all.js',
-          'lib/fixed-header-table/jquery.fixedheadertable.js '
-        ],
+        src: srcJs,
         dest: 'public/js/vendors.min.js',
       },
     },

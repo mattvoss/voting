@@ -90,9 +90,13 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
       },
 
       logIn: function(e) {
-        var view = this;
+        var view = this,
+            id = this.ui.registrantid.val().trim();
+        if (id.indexOf("|") != -1) {
+            id = id.split("|")[0];
+        }
         App.voter.set({
-          id: this.ui.registrantid.val().trim()
+          id: id
         });
         if (App.voter.isValid()) {
           App.voter.urlRoot = "/api/authenticate";
