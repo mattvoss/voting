@@ -14,6 +14,7 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
       events: {
         'keypress #registrantid'  :   'onInputKeypress',
         'click .next'             :   'logIn',
+        'click .start-over'       :   'startOver',
       },
 
       ui: {
@@ -120,7 +121,7 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
                 alert.render();
                 $(alert.$el).insertBefore(".login-title", this.$el);
                 setTimeout(function(){
-                  Backbone.history.navigate("start", { trigger: true });
+                  view.startOver();
                 },10000);
               }
             }
@@ -129,6 +130,11 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
           var model = new Backbone.Model(App.voter.validationError);
           this.showAlert(model);
         }
+      },
+      startOver: function(e) {
+        $(".alert", this.$el).remove();
+        this.ui.registrantid.val('');
+        this.ui.registrantid.focus();
       },
 
       update: function() {
