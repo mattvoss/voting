@@ -229,7 +229,7 @@ Voting.module('SiteId.Views', function(Views, App, Backbone, Marionette, $, _) {
       template: Templates.voterType,
       itemView : Views.PreviousVotersView,
       itemViewContainer: ".voters",
-      className: "row",
+      className: "row voterType",
       events: {
         'keypress #siteid'        :   'onInputKeypress',
         'click .next'             :   'next',

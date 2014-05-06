@@ -392,6 +392,7 @@ a {
   padding-bottom: 20px;
 }
 
+.voterType .iradio_line-aero,
 .candidates .iradio_line-aero {
   font-size: 25px;
 }
