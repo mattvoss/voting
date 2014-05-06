@@ -27,6 +27,7 @@ Voting.module('SiteId', function(SiteId, App, Backbone, Marionette, $, _) {
   _.extend(SiteId.Controller.prototype, {
 
     init: function() {
+      App.startPage = false;
       if (typeof App.voter == 'undefined') {
         Backbone.history.navigate("start", { trigger: true });
       } else {

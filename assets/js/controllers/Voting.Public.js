@@ -25,6 +25,7 @@ Voting.module('Public', function(Public, App, Backbone, Marionette, $, _) {
     // Start the app by showing the appropriate views
     // and fetching the list of todo items, if there are any
     start: function() {
+      App.startPage = true;
       App.voter = new App.Models.Voter();
       var options = {login: true};
       this.appBody = new App.Layout.Body(options);

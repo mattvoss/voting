@@ -1,4 +1,6 @@
-var Voting = new Backbone.Marionette.Application();
+var Voting = new Backbone.Marionette.Application({
+
+});
 
 var ModalRegion = Backbone.Marionette.Region.extend({
   el: "#modal",
@@ -25,6 +27,9 @@ var ModalRegion = Backbone.Marionette.Region.extend({
     this.$el.modal('hide');
   }
 });
+
+Voting.timeout = 30000;
+Voting.startPage = false;
 
 Voting.addRegions({
   body: '#body'

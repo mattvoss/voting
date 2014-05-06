@@ -30,6 +30,13 @@ Voting.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
     },
 
     events: {
+      "mousemove": "resetTimer",
+      "mousedown": "resetTimer",
+      "keypress": "resetTimer",
+      "DOMMouseScroll": "resetTimer",
+      "mousewheel": "resetTimer",
+      "touchmove": "resetTimer",
+      "MSPointerMove": "resetTimer"
 
     },
     resize: function() {
@@ -38,7 +45,10 @@ Voting.module('Layout', function(Layout, App, Backbone, Marionette, $, _) {
 
     onShow: function() {
       this.resize();
-    }
+    },
+
+
+
   });
 
   Layout.Header = Marionette.ItemView.extend({

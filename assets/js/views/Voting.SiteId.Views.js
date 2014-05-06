@@ -38,6 +38,10 @@ Voting.module('SiteId.Views', function(Views, App, Backbone, Marionette, $, _) {
       onShow: function() {
         var view = this;
         this.setupTypeAhead();
+
+        this.ui.siteid.focus();
+        //this.timeoutCb = setTimeout(this.goBack, App.timeout);
+
       },
 
       setupTypeAhead: function() {
@@ -81,6 +85,7 @@ Voting.module('SiteId.Views', function(Views, App, Backbone, Marionette, $, _) {
               '{accept} {cancel}'
              ]
             },
+            openOn : null,
             stayOpen : true,
             css: {
               // input & preview

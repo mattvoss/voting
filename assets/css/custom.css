@@ -212,11 +212,6 @@ a {
   height: 300px;
 }
 
-.modal-body {
-  height: 400px;
-  overflow: auto;
-}
-
 .race .candidates {
   padding-top: 9px;
 }

@@ -28,6 +28,8 @@
     "typeahead-css": "https://github.com/bassjobsen/typeahead.js-bootstrap-css.git",
     "keyboard": "https://github.com/mattvoss/Keyboard.git",
     "jquery-ui-bootstrap":"https://github.com/jquery-ui-bootstrap/jquery-ui-bootstrap.git",
-    "fixed-header-table":"https://github.com/markmalek/Fixed-Header-Table.git"
+    "fixed-header-table":"https://github.com/markmalek/Fixed-Header-Table.git",
+    "idle-js": "https://github.com/msanjdev/Idle.js.git",
+    "backbone.bootstrap-modal": "https://github.com/amsross/backbone.bootstrap-modal.git#b10227832bca7c9875e1e7666c6835f258c31288"
   }
 }
