@@ -264,6 +264,10 @@ Voting.module('SiteId.Views', function(Views, App, Backbone, Marionette, $, _) {
           });
         });
 
+        if (this.collection.length == 2) {
+          $(".prev", this.$el).text("Start Over");
+        }
+
       },
 
       onInputKeypress: function(evt) {
@@ -290,7 +294,11 @@ Voting.module('SiteId.Views', function(Views, App, Backbone, Marionette, $, _) {
       },
 
       prev: function(e) {
-        Backbone.history.navigate("siteid", { trigger: true });
+        if (this.collection.length == 2) {
+          Backbone.history.navigate("start", { trigger: true });
+        } else {
+          Backbone.history.navigate("siteid", { trigger: true });
+        }
       },
 
       next: function(e) {
