@@ -233,8 +233,7 @@ Voting.module('Vote.Views', function(Views, App, Backbone, Marionette, $, _) {
     className: "col-md-12",
 
     events: {
-      'click .done'             :   'done',
-      'click .cast-vote'        :   'castVotes'
+      'click .done'             :   'done'
     },
 
     initialize: function() {
@@ -247,7 +246,7 @@ Voting.module('Vote.Views', function(Views, App, Backbone, Marionette, $, _) {
       },15000);
     },
 
-    prev: function(e) {
+    done: function(e) {
       clearTimeout(App.timerId);
       Backbone.history.navigate("start", { trigger: true });
     },
