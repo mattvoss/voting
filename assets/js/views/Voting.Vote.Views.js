@@ -233,10 +233,7 @@ Voting.module('Vote.Views', function(Views, App, Backbone, Marionette, $, _) {
     className: "col-md-12",
 
     events: {
-      'click .next'             :   'next',
-      'click .prev'             :   'prev',
-      'click .up'               :   'scrollUp',
-      'click .down'             :   'scrollDown',
+      'click .done'             :   'done',
       'click .cast-vote'        :   'castVotes'
     },
 
@@ -248,7 +245,12 @@ Voting.module('Vote.Views', function(Views, App, Backbone, Marionette, $, _) {
       App.timerId = setTimeout(function(){
         Backbone.history.navigate("start", { trigger: true });
       },15000);
-    }
+    },
+
+    prev: function(e) {
+      clearTimeout(App.timerId);
+      Backbone.history.navigate("start", { trigger: true });
+    },
 
   });
 
