@@ -119,6 +119,9 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
                 $(".alert", view.$el).remove();
                 alert.render();
                 $(alert.$el).insertBefore(".login-title", this.$el);
+                setTimeout(function(){
+                  Backbone.history.navigate("start", { trigger: true });
+                },10000);
               }
             }
           );
