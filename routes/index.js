@@ -271,16 +271,12 @@ exports.initialize = function() {
 
     Sites = db.checkin.define('siteIds', {
       id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-      chapter:              { type: Sequelize.INTEGER(6) },
-      memberType:           { type: Sequelize.STRING(255) },
       company:              { type: Sequelize.STRING(255) },
       street1:              { type: Sequelize.STRING(255) },
       street2:              { type: Sequelize.STRING(255) },
       city:                 { type: Sequelize.STRING(255) },
       state:                { type: Sequelize.STRING(255) },
       zipCode:              { type: Sequelize.STRING(255) },
-      joinDate:             { type: Sequelize.DATE },
-      paidDate:             { type: Sequelize.DATE },
       siteId:               { type: Sequelize.STRING(255) }
     });
 
