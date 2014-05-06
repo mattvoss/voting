@@ -156,6 +156,7 @@ app.get('/api/logout', routes.logoutVoter);
 app.put('/api/voter/siteid/:voterId', routes.verifySiteId);
 app.put('/api/voter/voter-type/:voterId', routes.addVoterType);
 app.del('/api/voter/:voterId', routes.logoutVoter);
+app.post('/api/voter/:voterId/castVotes', routes.castVotes);
 app.get('/api/siteid/:query', routes.findSiteId);
 //app.get('/api/exhibitor/refresh', routes.refreshExhibitor);
 //app.post('/api/exhibitor/:exhibitorId/attendee', routes.addAttendee);

@@ -419,6 +419,21 @@ exports.addVoterType = function(req, res) {
   sendBack(res, member);
 };
 
+exports.castVotes = function(req, res) {
+  var votes = req.body,
+      recordVote = function(vote, cb) {
+        vote.datecast = new Date();
+        vote.uuid = uuid.v4();
+        Votes
+        .create(vote, ["uuid", "siteid", "electionid", "registrantid", "candidateid", "votertype", "datecast"])
+        .success(function(results) {
+          cb(null, results);
+        });
+      };
+  async.map(votes, recordVote, function(err, items) {
+    sendBack(res, items);
+  });
+};
 
 var sendBack = function(res, data) {
   res.setHeader('Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store');
@@ -456,7 +471,7 @@ var getSiteVoters = function(siteId, cb) {
               regType = registrantId.slice(0,1),
               regId = parseInt(registrantId.slice(1), 10);
 
-          registrants.getAttendee(regId, regType, function(member) {
+          registrants.getAttendee(registrantId, function(member) {
               member.voterType = vote.votertype;
               member.dateCast = vote.datecast;
               mapCb(null, member);

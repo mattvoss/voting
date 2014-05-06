@@ -8,7 +8,8 @@ Voting.module('Vote', function(Vote, App, Backbone, Marionette, $, _) {
   Vote.Router = Marionette.AppRouter.extend({
     appRoutes: {
       'vote/:electionId'      : 'init',
-      'review'                : 'showReview'
+      'review'                : 'showReview',
+      'finish'                : 'showFinish'
     }
   });
 
@@ -59,6 +60,13 @@ Voting.module('Vote', function(Vote, App, Backbone, Marionette, $, _) {
     showReview: function() {
       var reviewView = new Vote.Views.ReviewView({model: App.voter, collection: App.voter.get("votes")});
       this.appBody.main.show(reviewView);
+      //this.appBody.login.$el.show();
+      //$("#dash-container").show();
+    },
+
+    showFinish: function() {
+      var finishView = new Vote.Views.FinishView({model: App.voter, collection: App.voter.get("votes")});
+      this.appBody.main.show(finishView);
       //this.appBody.login.$el.show();
       //$("#dash-container").show();
     },

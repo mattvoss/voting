@@ -155,71 +155,100 @@ Voting.module('Vote.Views', function(Views, App, Backbone, Marionette, $, _) {
 
       onShow: function(e) {
 
-      },
-
-      checked: function(e) {
-
       }
 
   });
 
 
   Views.ReviewView = Marionette.CompositeView.extend({
-      template: Templates.review,
-      itemView : Views.ReviewVoteView,
-      itemViewContainer: ".votes",
-      className: "col-md-12",
+    template: Templates.review,
+    itemView : Views.ReviewVoteView,
+    itemViewContainer: ".votes",
+    className: "col-md-12",
 
-      events: {
-        'click .next'             :   'next',
-        'click .prev'             :   'prev',
-        'click .up'               :   'scrollUp',
-        'click .down'             :   'scrollDown'
-      },
-      initialize: function() {
-        this.scrolled = 0;
-      },
+    events: {
+      'click .next'             :   'next',
+      'click .prev'             :   'prev',
+      'click .up'               :   'scrollUp',
+      'click .down'             :   'scrollDown',
+      'click .cast-vote'        :   'castVotes'
+    },
+    initialize: function() {
+      this.scrolled = 0;
+    },
 
-      onRender: function() {
+    onRender: function() {
 
-      },
+    },
 
-      onShow: function(e) {
-        $('.vote-table').fixedHeaderTable({ height: 200 });
-      },
+    onShow: function(e) {
+      $('.vote-table').fixedHeaderTable({ height: 200 });
+    },
 
-      scrollUp: function(e) {
-        var view = this;
-        this.scrolled -= (this.scrolled >= 50) ? 50 : 0;
-        $(".fht-tbody", this.$el).stop().animate({
-            scrollTop: view.scrolled
-        });
-      },
+    scrollUp: function(e) {
+      var view = this;
+      this.scrolled -= (this.scrolled >= 50) ? 50 : 0;
+      $(".fht-tbody", this.$el).stop().animate({
+          scrollTop: view.scrolled
+      });
+    },
 
-      scrollDown: function(e) {
-        var view = this;
-        this.scrolled += 50;
-        $(".fht-tbody", this.$el).stop().animate({
-            scrollTop: view.scrolled
-        });
-      },
+    scrollDown: function(e) {
+      var view = this;
+      this.scrolled += 50;
+      $(".fht-tbody", this.$el).stop().animate({
+          scrollTop: view.scrolled
+      });
+    },
 
-      next: function(e) {
-        var view = this;
+    next: function(e) {
+      var view = this;
 
 
-        if (App.voter.get("votes").length == App.offices.length) {
-          Backbone.history.navigate("review", { trigger: true });
-        } else {
-          var index = App.offices.indexOf(this.model),
-              nextOffice = App.offices.at(index+1);
-          Backbone.history.navigate("vote/"+nextOffice.get("id"), { trigger: true });
-        }
-      },
-
-      prev: function(e) {
-        Backbone.history.navigate("voter-type-prev", { trigger: true });
+      if (App.voter.get("votes").length == App.offices.length) {
+        Backbone.history.navigate("review", { trigger: true });
+      } else {
+        var index = App.offices.indexOf(this.model),
+            nextOffice = App.offices.at(index+1);
+        Backbone.history.navigate("vote/"+nextOffice.get("id"), { trigger: true });
       }
+    },
+
+    prev: function(e) {
+      Backbone.history.navigate("voter-type-prev", { trigger: true });
+    },
+
+    castVotes: function(e) {
+      var votes = App.voter.get("votes");
+      votes.url = "/api/voter/"+App.voter.id+"/castVotes";
+      votes.save({success: function(votes) {
+        Backbone.history.navigate("finish", { trigger: true });
+      }});
+    }
+
+  });
+
+  Views.FinishView = Marionette.ItemView.extend({
+    template: Templates.finish,
+    className: "col-md-12",
+
+    events: {
+      'click .next'             :   'next',
+      'click .prev'             :   'prev',
+      'click .up'               :   'scrollUp',
+      'click .down'             :   'scrollDown',
+      'click .cast-vote'        :   'castVotes'
+    },
+
+    initialize: function() {
+
+    },
+
+    onShow: function() {
+      setTimeout(function(){
+        Backbone.history.navigate("start", { trigger: true });
+      },15000);
+    }
 
   });
 

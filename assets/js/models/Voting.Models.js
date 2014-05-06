@@ -36,8 +36,12 @@ Voting.module('Models', function(Models, App, Backbone, Marionette, $, _) {
   });
 
   Models.Votes = Backbone.Collection.extend({
+    urlRoot: "/api/castVotes",
     model: Models.Vote,
-    idAttribute: "id"
+    idAttribute: "id",
+    save: function (options) {
+      Backbone.sync("create", this, options);
+    }
   });
 
   Models.Voter = Backbone.SuperModel.extend({
