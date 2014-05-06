@@ -1,9 +1,9 @@
 node_modules/
 settings.json
 access.log
-public/js/bundle.js
-public/js/templates.js
-public/js/vendor.js
+public/
+bower_components/
+lib/
 /app.log
 /reg.dor.key
 /reg.dor.tamu.edu.crt
