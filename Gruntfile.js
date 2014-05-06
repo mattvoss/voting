@@ -41,22 +41,18 @@ module.exports = function(grunt) {
             'lib/backbone/backbone.js',
             'lib/backbone.wreqr/lib/backbone.wreqr.js',
             'lib/backbone.babysitter/backbone.babysitter.js',
-            'lib/backbone.supermodel/build/backbone.supermodel.js',
+            'lib/backbone.supermodel/backbone.supermodel.js',
             'bower_components/marionette/lib/core/backbone.marionette.js',
             'lib/backbone.marionette.handlebars/backbone.marionette.handlebars.js',
-            'lib/backbone-forms/distribution/backbone-forms.js',
-            'lib/backbone-forms/distribution/editors/list.js',
-            'lib/backbone-forms/distribution/templates/bootstrap.js',
-            'lib/microplugin/microplugin.js',
-            'lib/sifter/sifter.js',
-            'lib/selectize/selectize.js',
-            'lib/spin.js/spin.js',
-            'lib/ladda-bootstrap/ladda.js',
             'lib/moment/moment.js',
-            'lib/jQuery-Mask-Plugin/jquery.mask.min.js',
-            'lib/placeholders/build/placeholders.js',
             'lib/messenger/messenger.js',
-            'lib/messenger/messenger-theme-future.js'
+            'lib/messenger/messenger-theme-future.js',
+            'lib/typeahead.js/typeahead.bundle.js',
+            'bower_components/iCheck/icheck.js',
+            'lib/jquery-ui/jquery-ui.js',
+            'lib/keyboard/jquery.keyboard.js',
+            'bower_components/keyboard/js/jquery.keyboard.extension-all.js',
+            'lib/fixed-header-table/jquery.fixedheadertable.js '
           ]
         }
       },
@@ -76,12 +72,17 @@ module.exports = function(grunt) {
         files: {
           'public/css/app.css': [
             'lib/bootstrap/bootstrap.css',
+            'bower_components/Bootflat/bootflat/css/bootflat.css',
             'bower_components/bootstrap-jasny/dist/extend/css/jasny-bootstrap.css',
             'lib/font-awesome/css/font-awesome.css',
             'lib/selectize/selectize.css',
             'lib/ladda-bootstrap/ladda-themeless.css',
             'lib/messenger/messenger.css',
             'lib/messenger/messenger-theme-future.css',
+            'lib/typeahead-css/typeaheadjs.css',
+            'bower_components/iCheck/skins/line/aero.css',
+            'lib/keyboard/keyboard.css',
+            'lib/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css',
             'assets/css/custom.css'
           ]
         }
@@ -96,12 +97,17 @@ module.exports = function(grunt) {
       css: {
         src: [
           'lib/bootstrap/bootstrap.css',
+          'bower_components/Bootflat/bootflat/css/bootflat.css',
           'bower_components/bootstrap-jasny/dist/extend/css/jasny-bootstrap.css',
           'lib/font-awesome/css/font-awesome.css',
           'lib/selectize/selectize.css',
           'lib/ladda-bootstrap/ladda-themeless.css',
           'lib/messenger/messenger.css',
           'lib/messenger/messenger-theme-future.css',
+          'lib/typeahead-css/typeaheadjs.css',
+          'bower_components/iCheck/skins/line/aero.css',
+          'lib/keyboard/keyboard.css',
+          'lib/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.10.0.custom.css',
           'assets/css/custom.css'
         ],
         dest: 'public/css/app.css',
@@ -123,23 +129,18 @@ module.exports = function(grunt) {
           'lib/backbone/backbone.js',
           'lib/backbone.wreqr/lib/backbone.wreqr.js',
           'lib/backbone.babysitter/backbone.babysitter.js',
-          'lib/backbone.supermodel/build/backbone.supermodel.js',
+          'lib/backbone.supermodel/backbone.supermodel.js',
           'bower_components/marionette/lib/core/backbone.marionette.js',
           'lib/backbone.marionette.handlebars/backbone.marionette.handlebars.js',
-          'lib/backbone-forms/distribution/backbone-forms.js',
-          'lib/backbone-forms/distribution/editors/list.js',
-          'lib/backbone-forms/distribution/templates/bootstrap.js',
-          'lib/microplugin/microplugin.js',
-          'lib/sifter/sifter.js',
-          'lib/selectize/selectize.js',
-          'lib/spin.js/spin.js',
-          'lib/ladda-bootstrap/ladda.js',
           'lib/moment/moment.js',
-          'lib/jQuery-Mask-Plugin/jquery.mask.min.js',
-          'lib/placeholders/build/placeholders.js',
-          'bower_components/ie-alert/theplugin/iealert.js',
           'lib/messenger/messenger.js',
-          'lib/messenger/messenger-theme-future.js'
+          'lib/messenger/messenger-theme-future.js',
+          'lib/typeahead.js/typeahead.bundle.js',
+          'bower_components/iCheck/icheck.js',
+          'lib/jquery-ui/jquery-ui.js',
+          'lib/keyboard/jquery.keyboard.js',
+          'bower_components/keyboard/js/jquery.keyboard.extension-all.js',
+          'lib/fixed-header-table/jquery.fixedheadertable.js '
         ],
         dest: 'public/js/vendors.min.js',
       },
@@ -160,33 +161,6 @@ module.exports = function(grunt) {
             dest: 'public/fonts/',
             filter: 'isFile'
           },
-          {
-            expand: true,
-            flatten: true,
-            src: [
-              'lib/leaflet/dist/*.css'
-            ],
-            dest: 'public/css/',
-            filter: 'isFile'
-          },
-          {
-            expand: true,
-            flatten: true,
-            src: [
-              'lib/leaflet/dist/images/*.*'
-            ],
-            dest: 'public/images/',
-            filter: 'isFile'
-          },
-          {
-            expand: true,
-            flatten: true,
-            src: [
-              'lib/cartodb.js/themes/img/*.*'
-            ],
-            dest: 'public/images/',
-            filter: 'isFile'
-          },
 
           {
             expand: true,
@@ -197,22 +171,14 @@ module.exports = function(grunt) {
             dest: 'public/css/',
             filter: 'isFile'
           },
+
           {
             expand: true,
             flatten: true,
             src: [
-              'lib/cartodb.js/dist/*.css'
+              'bower_components/iCheck/skins/line/*.png'
             ],
             dest: 'public/css/',
-            filter: 'isFile'
-          },
-          {
-            expand: true,
-            flatten: true,
-            src: [
-              'lib/ion.rangeSlider/img/*.png'
-            ],
-            dest: 'public/images/',
             filter: 'isFile'
           },
 

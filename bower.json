@@ -1,5 +1,5 @@
 {
-  "name": "exhibitor-bower",
+  "name": "conference-voting-bower",
   "version": "0.1.0",
   "dependencies": {
     "handlebars": "*",
@@ -16,12 +16,18 @@
     "selectize": "*",
     "ladda-bootstrap": "*",
     "moment": "*",
-    "bootflat": "https://github.com/flathemes/bootflat.git",
+    "Bootflat": "*",
+    "iCheck": "*",
     "jQuery-Mask-Plugin": "*",
     "bootstrap-jasny": "*",
     "backbone.supermodel": "https://github.com/laoshanlung/backbone.supermodel.git",
     "placeholders": "https://github.com/Spinarooni/Placeholders.js/archive/master.zip",
     "ie-alert": "*",
-    "messenger": "*"
+    "messenger": "*",
+    "typeahead.js": "*",
+    "typeahead-css": "https://github.com/bassjobsen/typeahead.js-bootstrap-css.git",
+    "keyboard": "https://github.com/mattvoss/Keyboard.git",
+    "jquery-ui-bootstrap":"https://github.com/jquery-ui-bootstrap/jquery-ui-bootstrap.git",
+    "fixed-header-table":"https://github.com/markmalek/Fixed-Header-Table.git"
   }
 }

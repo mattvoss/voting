@@ -21,7 +21,8 @@
     "moment": "latest",
     "nconf": "latest",
     "express-cache-control": "latest",
-    "mysql": "latest"
+    "mysql": "latest",
+    "node-registrants": "mattvoss/node-registrants"
   },
   "devDependencies": {
     "grunt": "latest",

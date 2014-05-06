@@ -1,236 +1,491 @@
-"use strict";
+(function(){
+  "use strict";
 
 var fs = require('fs'),
     path = require('path'),
-    ldap = require('ldapjs'),
-    mysql = require('mysql'),
     email = require('nodemailer'),
     crypto = require('crypto'),
     spawn = require('child_process').spawn,
-    execFile = require('child_process').execFile,
     async = require('async'),
-    Acl = require('acl'),
     uuid = require("node-uuid"),
     glob = require('glob'),
     underscore = require('underscore'),
-    pdf417 = require('pdf417'),
-    ipp = require('ipp'),
     handlebars = require('handlebars'),
-    authnet = require('authnet'),
-    svgHeader = fs.readFileSync("./header.svg", "utf8"),
+    Sequelize = require("sequelize"),
+    Swag = require('swag'),
+    Registrants = require("node-registrants"),
+    registrants,
+    db = {},
+    Schemas = {},
+    Models = {},
+    DocumentTypes = {},
+    Workflows = {},
     opts = {},
-    connection = null,
-    client = null,
-    transport = null,
-    acl = null,
-    db = null,
-    reconnectTries = 0;
+    config = {},
+    reconnectTries = 0,
+    hmac, signature, connection, client,
+    transport, acl,
+    CheckinMemberFieldValues, RegMemberFieldValues, CheckinGroupMembers,
+    RegGroupMembers, CheckinEventFields, CheckinBiller, RegBiller,
+    CheckinBillerFieldValues, RegBillerFieldValues, RegEventFees,
+    CheckinEventFees, CheckinExhibitorAttendeeNumber, CheckinExhibitorAttendees,
+    ElectionOffices, ElectionOfficeCandidates, Votes, Sites;
 
-/**
- * usages (handlebars)
- * {{short_string this}}
- * {{short_string this length=150}}
- * {{short_string this length=150 trailing="---"}}
-**/
-handlebars.registerHelper('short_string', function(context, options){
-    //console.log(options);
-    var maxLength = options.hash.length || 100;
-    var trailingString = options.hash.trailing || '';
-    if (typeof context != "undefined") {
-        if(context.length > maxLength){
-            return context.substring(0, maxLength) + trailingString;
-        }
-    }
-    return context;
-});
+Swag.registerHelpers(handlebars);
+
 
 exports.setKey = function(key, value) {
     opts[key] = value;
 };
 
 exports.initialize = function() {
-    //Initialize Mysql
-    getConnection();
+    //Initialize PGsql
+    //getConnection();
 
     //Initialize Email Client
+
     transport = email.createTransport("sendmail", {
-        args: ["-f noreply@vpr.tamu.edu"]
+       args: ["-t", "-f", "noreply@regionvivpp.org"]
+    });
+
+    console.log(opts.configs.get("redis"));
+
+    db.checkin = new Sequelize(
+      opts.configs.get("mysql:checkin:database"),
+      opts.configs.get("mysql:checkin:username"),
+      opts.configs.get("mysql:checkin:password"),
+      {
+          dialect: 'mysql',
+          omitNull: true,
+          host: opts.configs.get("mysql:checkin:host") || "localhost",
+          port: opts.configs.get("mysql:checkin:port") || 3306,
+          pool: { maxConnections: 5, maxIdleTime: 30},
+          define: {
+            freezeTableName: true,
+            timestamps: false
+          }
+    });
+
+    registrants = Registrants.init({
+      "host": opts.configs.get("mysql:checkin:host") || "localhost",
+      "username": opts.configs.get("mysql:checkin:username"),
+      "password": opts.configs.get("mysql:checkin:password"),
+      "database": opts.configs.get("mysql:checkin:database"),
+      "port": opts.configs.get("mysql:checkin:port") || 3306
+    });
+
+    CheckinMemberFieldValues = db.checkin.define('member_field_values', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      local_id:             { type: Sequelize.INTEGER },
+      event_id:             { type: Sequelize.STRING(36) },
+      field_id:             { type: Sequelize.INTEGER },
+      member_id:            { type: Sequelize.INTEGER },
+      value:                { type: Sequelize.TEXT }
+    });
+
+    CheckinGroupMembers = db.checkin.define('group_members', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      groupMemberId :       { type: Sequelize.INTEGER },
+      event_id :            { type: Sequelize.STRING(36) },
+      groupUserId :         { type: Sequelize.INTEGER },
+      created :             { type: Sequelize.DATE },
+      confirmnum :          { type: Sequelize.STRING(100) },
+      attend:               { type: Sequelize.BOOLEAN },
+      discount_code_id :    { type: Sequelize.INTEGER },
+      checked_in_time :     { type: Sequelize.DATE }
+    });
+
+    CheckinEventFields = db.checkin.define('event_fields', {
+      id:             { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      local_id :       { type: Sequelize.INTEGER },
+      event_id :       { type: Sequelize.STRING(36) },
+      field_id :       { type: Sequelize.INTEGER },
+      local_event_id :       { type: Sequelize.INTEGER },
+      badge_order :       { type: Sequelize.INTEGER },
+      class :       { type: Sequelize.TEXT },
+      name :       { type: Sequelize.STRING(50) },
+      label :       { type: Sequelize.STRING(255) },
+      field_size:       { type: Sequelize.INTEGER },
+      description :       { type: Sequelize.STRING(255) },
+      ordering :       { type: Sequelize.INTEGER },
+      published :       { type: Sequelize.INTEGER },
+      required:       { type: Sequelize.INTEGER },
+      values :       { type: Sequelize.TEXT },
+      type :       { type: Sequelize.INTEGER },
+      selected :       { type: Sequelize.STRING(255) },
+      rows:       { type: Sequelize.INTEGER },
+      cols:       { type: Sequelize.INTEGER },
+      fee_field:       { type: Sequelize.INTEGER },
+      fees :       { type: Sequelize.TEXT },
+      new_line:       { type: Sequelize.INTEGER },
+      textual :       { type: Sequelize.TEXT },
+      export_individual :       { type: Sequelize.BOOLEAN },
+      export_group :       { type: Sequelize.BOOLEAN },
+      attendee_list :       { type: Sequelize.BOOLEAN },
+      usagelimit :       { type: Sequelize.TEXT },
+      fee_type :       { type: Sequelize.BOOLEAN },
+      filetypes :       { type: Sequelize.TEXT },
+      upload :       { type: Sequelize.BOOLEAN },
+      filesize :       { type: Sequelize.INTEGER },
+      hidden :       { type: Sequelize.BOOLEAN },
+      allevent :       { type: Sequelize.BOOLEAN },
+      maxlength :       { type: Sequelize.INTEGER },
+      date_format :       { type: Sequelize.STRING(25) },
+      parent_id :       { type: Sequelize.INTEGER },
+      selection_values :       { type: Sequelize.TEXT },
+      textareafee :       { type: Sequelize.TEXT },
+      showcharcnt :       { type: Sequelize.BOOLEAN },
+      default :       { type: Sequelize.BOOLEAN },
+      confirmation_field :       { type: Sequelize.BOOLEAN },
+      listing :       { type: Sequelize.TEXT },
+      textualdisplay :       { type: Sequelize.BOOLEAN },
+      applychangefee :       { type: Sequelize.BOOLEAN },
+      tag :       { type: Sequelize.STRING(255) },
+      all_tag_enable :       { type: Sequelize.BOOLEAN },
+      minimum_group_size :       { type: Sequelize.INTEGER },
+      max_group_size :       { type: Sequelize.INTEGER },
+      discountcode_depend :       { type: Sequelize.BOOLEAN },
+      discount_codes :       { type: Sequelize.TEXT },
+      showed :       { type: Sequelize.INTEGER },
+      group_behave :       { type: Sequelize.INTEGER }
+    });
+
+    CheckinBiller = db.checkin.define('biller', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      userId :              { type: Sequelize.INTEGER },
+      eventId :             { type: Sequelize.STRING(36) },
+      local_eventId :       { type: Sequelize.INTEGER },
+      type :                { type: Sequelize.ENUM('I','G') },
+      register_date :       { type: Sequelize.DATE },
+      payment_type :        { type: Sequelize.STRING(100) },
+      due_amount :          { type: Sequelize.DECIMAL(10,2) },
+      pay_later_option:     { type: Sequelize.INTEGER },
+      confirmNum :          { type: Sequelize.STRING(50) },
+      user_id :             { type: Sequelize.INTEGER },
+      payment_verified :    { type: Sequelize.INTEGER },
+      pay_later_paid:       { type: Sequelize.INTEGER },
+      discount_code_id :    { type: Sequelize.INTEGER },
+      billing_firstname :   { type: Sequelize.STRING(150) },
+      billing_lastname :    { type: Sequelize.STRING(150) },
+      billing_address :     { type: Sequelize.STRING(255) },
+      billing_city :        { type: Sequelize.STRING(150) },
+      billing_state :       { type: Sequelize.STRING(150) },
+      billing_zipcode :     { type: Sequelize.STRING(10) },
+      billing_email :       { type: Sequelize.STRING(150) },
+      due_payment :         { type: Sequelize.DECIMAL(10,2) },
+      status :              { type: Sequelize.INTEGER },
+      attend :              { type: Sequelize.BOOLEAN },
+      paid_amount :         { type: Sequelize.STRING(30) },
+      transaction_id :      { type: Sequelize.STRING(255) },
+      memtot :              { type: Sequelize.INTEGER },
+      cancel :              { type: Sequelize.INTEGER }
+    });
+
+    CheckinEventFees = db.checkin.define('event_fees', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      local_id :            { type: Sequelize.INTEGER },
+      event_id :            { type: Sequelize.STRING(36) },
+      user_id :             { type: Sequelize.INTEGER },
+      basefee :             { type: Sequelize.STRING(20) },
+      memberdiscount :      { type: Sequelize.STRING(12) },
+      latefee :             { type: Sequelize.STRING(12) },
+      birddiscount :        { type: Sequelize.STRING(12) },
+      discountcodefee :     { type: Sequelize.STRING(12) },
+      customfee :           { type: Sequelize.STRING(12) },
+      tax :                 { type: Sequelize.STRING(12) },
+      fee :                 { type: Sequelize.STRING(12) },
+      paid_amount :         { type: Sequelize.STRING(12) },
+      status :              { type: Sequelize.STRING(12), defaultValue: '0' },
+      due:                  { type: Sequelize.STRING(20), defaultValue: '0' },
+      payment_method:       { type: Sequelize.STRING(20), defaultValue: '0' },
+      feedate :             { type: Sequelize.DATE },
+      changefee :           { type: Sequelize.STRING(12), defaultValue: '0' },
+      cancelfee :           { type: Sequelize.STRING(12), defaultValue: '0' }
+    });
+
+    CheckinBillerFieldValues = db.checkin.define('biller_field_values', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      local_id :            { type: Sequelize.INTEGER },
+      event_id :            { type: Sequelize.STRING(36) },
+      field_id :            { type: Sequelize.INTEGER },
+      user_id :             { type: Sequelize.INTEGER },
+      value :               { type: Sequelize.TEXT }
+    });
+
+    ElectionOffices = db.checkin.define('electionOffices', {
+      id :                    { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      conferenceid :          { type: Sequelize.INTEGER },
+      position :              { type: Sequelize.INTEGER },
+      title :                 { type: Sequelize.STRING(255) },
+      description :           { type: Sequelize.STRING(255) }
+    });
+
+    ElectionOfficeCandidates = db.checkin.define('electionOfficeCandidates', {
+      id :                    { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      electionid :            { type: Sequelize.INTEGER },
+      position :              { type: Sequelize.INTEGER },
+      name :                  { type: Sequelize.STRING(255) },
+      company :               { type: Sequelize.STRING(255) }
+    });
+
+    ElectionOffices.hasMany(ElectionOfficeCandidates, {as: 'Candidates', foreignKey: 'electionid'});
+
+    Votes = db.checkin.define('votes', {
+      id :                    { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      uuid :                  { type: Sequelize.UUIDV4 },
+      siteid :                { type: Sequelize.STRING(255) },
+      electionid :            { type: Sequelize.INTEGER },
+      registrantid :          { type: Sequelize.STRING(25) },
+      candidateid :           { type: Sequelize.INTEGER },
+      votertype:              { type: Sequelize.ENUM('management','non-management') },
+      datecast :              { type: Sequelize.DATE }
+    });
+
+    CheckinExhibitorAttendeeNumber = db.checkin.define('exhibitorAttendeeNumber', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      userId :              { type: Sequelize.INTEGER },
+      eventId :             { type: Sequelize.STRING(255) },
+      attendees :           { type: Sequelize.INTEGER }
+    });
+
+    CheckinExhibitorAttendees = db.checkin.define('exhibitorAttendees', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      userId :              { type: Sequelize.INTEGER },
+      eventId :             { type: Sequelize.STRING(36) },
+      firstname :           { type: Sequelize.STRING(255) },
+      lastname :            { type: Sequelize.STRING(255) },
+      address :             { type: Sequelize.STRING(255) },
+      address2 :            { type: Sequelize.STRING(255) },
+      city :                { type: Sequelize.STRING(255) },
+      state :               { type: Sequelize.STRING(255) },
+      zip :                 { type: Sequelize.STRING(15) },
+      email :               { type: Sequelize.STRING(255) },
+      phone :               { type: Sequelize.STRING(25) },
+      title :               { type: Sequelize.STRING(255) },
+      organization :        { type: Sequelize.STRING(255) },
+      created :             { type: Sequelize.DATE },
+      updated :             { type: Sequelize.DATE },
+      siteId :              { type: Sequelize.STRING(10) }
+    });
+
+    Sites = db.checkin.define('siteIds', {
+      id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      chapter:              { type: Sequelize.INTEGER(6) },
+      memberType:           { type: Sequelize.STRING(255) },
+      company:              { type: Sequelize.STRING(255) },
+      street1:              { type: Sequelize.STRING(255) },
+      street2:              { type: Sequelize.STRING(255) },
+      city:                 { type: Sequelize.STRING(255) },
+      state:                { type: Sequelize.STRING(255) },
+      zipCode:              { type: Sequelize.STRING(255) },
+      joinDate:             { type: Sequelize.DATE },
+      paidDate:             { type: Sequelize.DATE },
+      siteId:               { type: Sequelize.STRING(255) }
     });
 
 };
-
-var getOffices = function(cb) {
-    var sql = "SELECT * FROM electionOffices ORDER BY position ASC";
-
-
-    connection.query(sql, function(err, rows) {
-        sql = "";
-        var vars = [],
-            offices = rows;
-        if (offices.length > 0) {
-            offices.forEach(function(office, index) {
-                sql += "SELECT * FROM electionOfficeCandidates WHERE electionId = ? ORDER BY position ASC; ";
-                vars.push(office.id);
-            })
-        }
-        //console.log(sql);
-        connection.query(sql, vars, function(err, candidates) {
-            if (err) throw err;
-            //console.log(rows.length);
-            if (offices.length > 0) {
-                console.log("Total Offices:", offices.length);
-                processOffices(offices, candidates, 0, cb);
-            } else {
-                console.log("Total Offices: 0");
-                cb([]);
-            }
-        });
-    });
-}
-
-var processOffices = function(offices, candidates, index, cb) {
-
-    if (offices.length < 2) {
-        offices[index].candidates = candidates;
-    } else {
-        offices[index].candidates = candidates[index];
-    }
-    index++;
-    if (offices.length >= (index+1)) {
-        processOffices(offices, candidates, index, cb);
-    } else {
-        cb(offices);
-    }
-}
 
 /************
 * Routes
 *************/
 
 exports.index = function(req, res){
-    var sid = req.session.id;
-    //Regenerates the JS/template file
-    //if (req.url.indexOf('/bundle') === 0) { bundle(); }
+    var init = "$(document).ready(function() { Voting.voter = new Voting.Models.Voter(); Voting.start(); });";
+    fs.readFile(__dirname + '/../assets/templates/index.html', 'utf8', function(error, content) {
 
-    //Don't process requests for API endpoints
-    if (req.url.indexOf('/api') === 0 ) { return next(); }
-    console.log("[index] session id:", req.session.id);
+      ElectionOffices
+        .findAll({ where: { conferenceid: opts.configs.get("conferenceId") }, include: [{model:ElectionOfficeCandidates, as:"Candidates"}] })
+        .success(function(offices) {
+          init = "$(document).ready(function() {";
+          init += "Voting.offices = new Voting.Models.Offices(" + JSON.stringify(offices) + ");";
+          if ("voter" in req.session) {
+            init += "Voting.voter = new Voting.Models.Voter(" + JSON.stringify(req.session.voter) + ");";
+          }
+          init += "Voting.start();";
+          init += "});";
+            if (error) { console.log(error); }
+            var prefix = (opts.configs.get("prefix")) ? opts.configs.get("prefix") : "";
+            var pageBuilder = handlebars.compile(content),
+                html = pageBuilder({'init':init, 'prefix':prefix});
 
-    var init = "$(document).ready(function() { App.initialize(); });";
-    //if (typeof req.session.user !== 'undefined') {
-        init = "$(document).ready(function() { App.uid = '" + sid + "'; App.initialize(); });";
-    //}
-    fs.readFile(__dirname + '/../public/templates/index.html', 'utf8', function(error, content) {
-        if (error) { console.log(error); }
-        content = content.replace("{{init}}", init);
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.write(content, 'utf-8');
-        res.end('\n');
-    });
-};
-
-//Return documents
-exports.offices = function(req, res) {
-
-    var callback = function(offices) {
-            //if (err) console.log(err);
-            res.setHeader('Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store');
-            res.writeHead(200, { 'Content-type': 'application/json' });
-            res.write(JSON.stringify(offices), 'utf-8');
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.write(html, 'utf-8');
             res.end('\n');
-        };
-    getOffices(callback);
+        }
+      );
+    });
 };
 
-
-
-//Helpers
-var getConnection = function() {
-    // Test connection health before returning it to caller.
-    if ((connection) && (connection._socket)
-            && (connection._socket.readable)
-            && (connection._socket.writable)) {
-        return connection;
-    }
-    console.log(((connection) ?
-            "UNHEALTHY SQL CONNECTION; RE" : "") + "CONNECTING TO SQL.");
-    connection = mysql.createConnection(opts.configs.mysql);
-    connection.connect(function(err) {
-        if (err) {
-            console.log("(Retry: "+reconnectTries+") SQL CONNECT ERROR: " + err);
-            reconnectTries++;
-            var timeOut = ((reconnectTries * 50) < 30000) ? reconnectTries * 50 : 30000;
-            if (reconnectTries == 50) {
-                /**
-                var mailOptions = {
-                    from: "VPPPA Site ID Lookup <noreply@vpppa.org>", // sender address
-                    to: "problem@griffinandassocs.com", // list of receivers
-                    subject: "VPPPA Site ID Lookup DB Issue", // Subject line
-                    text: "The VPPPA Site ID Lookup is unable to connect to the mysql db server.", // plaintext body
-                    html: "<b>The VPPPA Site ID Lookup is unable to connect to the mysql db server.</b>" // html body
-                };
-
-                transport.sendMail(mailOptions, function(error, response){
-                    if(error){
-                        console.log(error);
-                    }else{
-                        console.log("Message sent: " + response.message);
-                    }
-
-                    // if you don't want to use this transport object anymore, uncomment following line
-                    //smtpTransport.close(); // shut down the connection pool, no more messages
-                });
-                **/
-            }
-            setTimeout(getConnection, timeOut);
+//Auth a user
+exports.authVoter = function(req, res) {
+  var request = req,
+      registrantId = req.body.id,
+      regType = registrantId.slice(0,1),
+      regId = parseInt(registrantId.slice(1), 10),
+      authIssue = function(response) {
+        res.setHeader('Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store');
+        res.writeHead(401, { 'Content-type': 'application/json' });
+        var errorMsg = {
+              status: "error",
+              messsage: {
+                response: response
+              }
+            };
+        res.write(JSON.stringify(errorMsg), 'utf-8');
+        res.end('\n');
+      };
+  Votes.find({ where: {registrantid: registrantId} }).success(function(vote) {
+    if (vote === null) {
+      registrants.getAttendee(regId, regType, function(member) {
+        if (member !== null) {
+          member.siteId = ("siteid" in member) ? member.siteid : member.siteId;
+          if (member.siteId !== "") {
+            getSiteInfo(member.siteId, function(site) {
+              member.voterType = null;
+              member.votes = [];
+              site = (site) ? site.toJSON() : {};
+              member.site = site;
+              member.registrantId = registrantId;
+              req.session.voter = member;
+              sendBack(res, member);
+            });
+          } else {
+            member.voterType = null;
+            member.votes = [];
+            member.registrantId = registrantId;
+            member.site = {};
+            req.session.voter = member;
+            sendBack(res, member);
+          }
         } else {
-            console.log("SQL CONNECT SUCCESSFUL.");
-            reconnectTries = 0;
-            handleDisconnect(connection);
+          authIssue("No record of that registrant id exists.");
         }
-    });
-    connection.on("close", function (err) {
-        console.log("SQL CONNECTION CLOSED.");
-    });
-    connection.on("error", function (err) {
-        console.log("SQL CONNECTION ERROR: " + err);
-    });
-    connection = connection;
-    return connection;
-}
-
-
-var handleDisconnect = function (connection) {
-  connection.on('error', function(err) {
-    if (!err.fatal) {
-      return;
+      });
+    } else {
+      authIssue("You have already voted.");
     }
-
-    if (err.code !== 'PROTOCOL_CONNECTION_LOST') {
-      throw err;
-    }
-
-    console.log('Re-connecting lost connection: ' + err.stack);
-
-    getConnection();
-
   });
 };
 
-function logAction(uid, objType, objId, modType, desc) {
-    var logData = {
-            objectType: objType,
-            objectId: objId,
-            uid: uid,
-            modType: modType,
-            description: desc
-        };
+//Log out the current user
+exports.logoutVoter = function(req, res) {
+ req.session.destroy(function () {
+    res.clearCookie('connect.sid', { path: '/' });
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.write(JSON.stringify({logout: true}), 'utf8');
+    res.end('\n');
+  });
+};
 
-    opts.io.broadcast('talk', logData);
-}
+exports.verifySiteId = function(req, res) {
+  var member = req.body;
+   async.waterfall([
+    function(callback){
+      getSiteInfo(member.siteId, function(site) {
+        site = site.toJSON();
+        callback(null, site);
+      });
+    },
+    function(site, callback){
+      getSiteVoters(site.siteId, function(voters) {
+        site.voters = voters;
+        callback(null, site);
+      });
+    }
+  ],function(err, site) {
+    req.session.voter.site = site;
+    req.session.voter.siteId = site.siteId;
+    member = req.session.voter;
+    sendBack(res, member);
+  });
+};
+
+exports.findSiteId = function(req, res) {
+  var query = req.params.query;
+  Sites
+  .findAll({ where: ["siteid LIKE ?", query+"%"] })
+  .success(function(siteids) {
+    sendBack(res, siteids);
+  });
+};
+
+exports.addVoterType = function(req, res) {
+  var member = req.body;
+  req.session.voter.voterType = member.voterType;
+  req.session.voter.votes = member.votes;
+  member = req.session.voter;
+  sendBack(res, member);
+};
+
+
+var sendBack = function(res, data) {
+  res.setHeader('Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store');
+  res.writeHead(200, { 'Content-type': 'application/json' });
+  res.write(JSON.stringify(data), 'utf-8');
+  res.end('\n');
+};
+
+var getSiteInfo = function(siteId, cb) {
+  Sites.find({ where: { siteId: siteId } }).success(function(site) {
+    cb(site);
+  });
+};
+
+var getSiteVoters = function(siteId, cb) {
+
+  async.waterfall([
+    function(callback){
+      Votes
+      .findAll(
+        {
+          where: { siteid: siteId },
+          group: 'registrantid'
+        }
+      )
+      .success(function(votes) {
+        callback(null, votes);
+      });
+    },
+    function(votes, callback){
+      async.map(
+        votes,
+        function(vote, mapCb) {
+          var registrantId = vote.registrantid,
+              regType = registrantId.slice(0,1),
+              regId = parseInt(registrantId.slice(1), 10);
+
+          registrants.getAttendee(regId, regType, function(member) {
+              member.voterType = vote.votertype;
+              member.dateCast = vote.datecast;
+              mapCb(null, member);
+          });
+        }, function(err, voters){
+          if( err ) {
+            callback(err, null);
+          } else {
+            callback(null, voters);
+          }
+        }
+      );
+    },
+  ],function(err, voters) {
+    if (err) console.log("error:", err);
+    cb(voters);
+  });
+
+
+};
 
 function pad(num, size) {
     var s = num+"";
     while (s.length < size) s = "0" + s;
     return s;
 }
+
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+}
+
+}());

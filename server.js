@@ -21,19 +21,19 @@ var express = require('express.io'),
 var salt = '20sdkfjk23';
 
 if (process.argv[2]) {
-    if (fs.lstatSync(process.argv[2])) {
-        configFile = require(process.argv[2]);
-    } else {
-        configFile = process.cwd() + '/config/settings.json';
-    }
+  if (fs.lstatSync(process.argv[2])) {
+    configFile = require(process.argv[2]);
+  } else {
+    configFile = process.cwd() + '/config/settings.json';
+  }
 } else {
-    configFile = process.cwd()+'/config/settings.json';
+  configFile = process.cwd()+'/config/settings.json';
 }
 
 config = nconf
-          .argv()
-          .env("__")
-          .file({ file: configFile });
+  .argv()
+  .env("__")
+  .file({ file: configFile });
 
 if (config.get("log")) {
     var access_logfile = fs.createWriteStream(config.get("log"), {flags: 'a'});
@@ -151,17 +151,19 @@ routes.initialize();
 =============================================================== */
 
 //API
-app.post('/api/exhibitor/authenticate', routes.authUser);
-app.get('/api/user/authenticate/logout', routes.logoutUser);
-app.del('/api/exhibitor/:userId', routes.logoutUser);
-app.get('/api/getbooths/:pos', routes.getBoothSize);
-app.get('/api/exhibitor/refresh', routes.refreshExhibitor);
-app.post('/api/exhibitor/:exhibitorId/attendee', routes.addAttendee);
-app.put('/api/exhibitor/:exhibitorId/attendee', routes.updateAttendee);
+app.post('/api/authenticate', routes.authVoter);
+app.get('/api/logout', routes.logoutVoter);
+app.put('/api/voter/siteid/:voterId', routes.verifySiteId);
+app.put('/api/voter/voter-type/:voterId', routes.addVoterType);
+app.del('/api/voter/:voterId', routes.logoutVoter);
+app.get('/api/siteid/:query', routes.findSiteId);
+//app.get('/api/exhibitor/refresh', routes.refreshExhibitor);
+//app.post('/api/exhibitor/:exhibitorId/attendee', routes.addAttendee);
+//app.put('/api/exhibitor/:exhibitorId/attendee', routes.updateAttendee);
 
 // Global handling
-app.get('/', cache("hours", 1), routes.index);
-app.get('*', cache("hours", 1), routes.index);
+app.get('/', routes.index);
+app.get('*', routes.index);
 
 
 /*  ==============================================================
