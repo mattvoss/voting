@@ -120,7 +120,7 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
                 $(".alert", view.$el).remove();
                 alert.render();
                 $(alert.$el).insertBefore(".login-title", this.$el);
-                setTimeout(function(){
+                view.timerId = setTimeout(function(){
                   view.startOver();
                 },10000);
               }
@@ -132,6 +132,7 @@ Voting.module('Public.Views', function(Views, App, Backbone, Marionette, $, _) {
         }
       },
       startOver: function(e) {
+        clearTimeout(this.timerId);
         $(".alert", this.$el).remove();
         this.ui.registrantid.val('');
         this.ui.registrantid.focus();
