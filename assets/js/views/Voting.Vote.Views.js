@@ -245,7 +245,7 @@ Voting.module('Vote.Views', function(Views, App, Backbone, Marionette, $, _) {
     },
 
     onShow: function() {
-      setTimeout(function(){
+      App.timerId = setTimeout(function(){
         Backbone.history.navigate("start", { trigger: true });
       },15000);
     }
