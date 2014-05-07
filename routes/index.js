@@ -9,6 +9,7 @@ var fs = require('fs'),
     async = require('async'),
     uuid = require("node-uuid"),
     glob = require('glob'),
+    redis = require("redis"),
     underscore = require('underscore'),
     handlebars = require('handlebars'),
     Sequelize = require("sequelize"),
@@ -24,7 +25,7 @@ var fs = require('fs'),
     config = {},
     reconnectTries = 0,
     hmac, signature, connection, client,
-    transport, acl,
+    transport, acl, redisClient,
     CheckinMemberFieldValues, RegMemberFieldValues, CheckinGroupMembers,
     RegGroupMembers, CheckinEventFields, CheckinBiller, RegBiller,
     CheckinBillerFieldValues, RegBillerFieldValues, RegEventFees,
@@ -74,6 +75,8 @@ exports.initialize = function() {
       "port": opts.configs.get("mysql:checkin:port") || 3306,
       "logging": false
     });
+
+    redisClient = redis.createClient(opts.configs.get("redis:port"), opts.configs.get("redis:host"));
 
     CheckinMemberFieldValues = db.checkin.define('member_field_values', {
       id:                   { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
@@ -427,6 +430,10 @@ exports.castVotes = function(req, res) {
         });
       };
   async.map(votes, recordVote, function(err, items) {
+    var message = {
+          "status": "votes cast"
+        };
+    redisClient.publish("voting", JSON.stringify(message));
     sendBack(res, items);
   });
 };
